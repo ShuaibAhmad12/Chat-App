@@ -28,7 +28,7 @@ export function ChatInterface() {
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null)
   const [activeTab, setActiveTab] = useState("general")
-  const [debugMode, setDebugMode] = useState(false)
+  
 
   // General chat hooks - now using the fixed version with image support
   const { messages, loading, sendMessage, sendImage, error } = useRealtimeMessages()
@@ -104,9 +104,7 @@ export function ChatInterface() {
             </div>
             <div className="flex gap-1">
               <ThemeToggle />
-              <Button variant="ghost" size="sm" onClick={() => setDebugMode(!debugMode)}>
-                <Settings className="h-4 w-4" />
-              </Button>
+              
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -202,11 +200,7 @@ export function ChatInterface() {
             </TabsContent>
           </Tabs>
 
-          {debugMode && (
-            <div className="mt-4">
-              <DetailedDebug />
-            </div>
-          )}
+
         </div>
       </div>
 
