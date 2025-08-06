@@ -7,7 +7,7 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "ChatApp - Real-time Chat Application",
+  title: "ShaibiHub - Real-time Chat Application",
   description: "A modern real-time chat application built with Next.js and Supabase",
 }
 

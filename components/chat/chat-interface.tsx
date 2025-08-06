@@ -99,7 +99,7 @@ export function ChatInterface() {
                 <MessageCircle className="h-5 w-5 text-primary-foreground" />
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                ChatApp
+                ShaibiHub
               </h1>
             </div>
             <div className="flex gap-1">
@@ -286,7 +286,7 @@ export function ChatInterface() {
       <div className="md:hidden fixed top-0 left-0 right-0 bg-card/90 backdrop-blur-sm border-b p-4 z-10">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold">
-            {activeTab === "direct" && selectedUser ? selectedUser.username : "ChatApp"}
+            {activeTab === "direct" && selectedUser ? selectedUser.username : "ShaibiHub"}
           </h1>
           <div className="flex items-center gap-2">
             {activeTab === "direct" && selectedUser && (
