@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
-import { useRealtimeMessages } from "../../hooks/use-realtime-messages"
+import { useRealtimeMessages } from "@/hooks/use-realtime-messages"
 import { useDirectMessages } from "@/hooks/use-direct-messages"
 import { useUserPresence } from "@/hooks/use-user-presence"
 import { useNotifications } from "@/hooks/use-notifications"
@@ -10,26 +10,27 @@ import { MessageItem } from "./message-item"
 import { MessageInput } from "./message-input"
 import { ConversationsList } from "./conversations-list"
 import { DirectMessageInterface } from "./direct-message-interface"
+import { StickyNotesPage } from "../notes/sticky-notes-page"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { LogOut, MessageCircle, Users, Settings } from "lucide-react"
+import { LogOut, MessageCircle, Users, Settings, StickyNote } from "lucide-react"
 import type { Profile } from "@/lib/types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useHeartbeat } from "@/hooks/use-heartbeat"
 import { UserStatusIndicator } from "./user-status-indicator"
 import { DetailedDebug } from "../debug/detailed-debug"
-import { CursorDebug } from "../debug/cursor-debug"
 
 export function ChatInterface() {
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null)
   const [activeTab, setActiveTab] = useState("general")
   const [debugMode, setDebugMode] = useState(false)
+  const [showNotes, setShowNotes] = useState(false)
 
   // General chat hooks - now using the fixed version with image support
   const { messages, loading, sendMessage, sendImage, error } = useRealtimeMessages()
@@ -78,6 +79,15 @@ export function ChatInterface() {
     sendImage(imageUrl, imageName)
   }
 
+  const handleBackFromNotes = () => {
+    setShowNotes(false)
+  }
+
+  // Show sticky notes page
+  if (showNotes) {
+    return <StickyNotesPage onBack={handleBackFromNotes} />
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
@@ -104,6 +114,9 @@ export function ChatInterface() {
               </h1>
             </div>
             <div className="flex gap-1">
+              <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} title="Sticky Notes">
+                <StickyNote className="h-4 w-4" />
+              </Button>
               <ThemeToggle />
               <Button variant="ghost" size="sm" onClick={() => setDebugMode(!debugMode)}>
                 <Settings className="h-4 w-4" />
@@ -212,12 +225,11 @@ export function ChatInterface() {
             </TabsContent>
           </Tabs>
 
-         {debugMode && (
-        <div className="mt-4 space-y-4">
-          <DetailedDebug />
-          <CursorDebug />
-        </div>
-      )}
+          {debugMode && (
+            <div className="mt-4">
+              <DetailedDebug />
+            </div>
+          )}
         </div>
       </div>
 
@@ -282,7 +294,7 @@ export function ChatInterface() {
       {/* Mobile Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-sm border-t p-2 z-10">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+          <TabsList className="grid w-full grid-cols-3 bg-muted/50">
             <TabsTrigger
               value="general"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -294,6 +306,13 @@ export function ChatInterface() {
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               Direct
+            </TabsTrigger>
+            <TabsTrigger
+              value="notes"
+              onClick={() => setShowNotes(true)}
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Notes
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -314,6 +333,9 @@ export function ChatInterface() {
             <Badge variant="secondary" className="text-xs">
               {onlineUsers.length} online
             </Badge>
+            <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)}>
+              <StickyNote className="h-4 w-4" />
+            </Button>
             <ThemeToggle />
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="h-4 w-4" />
