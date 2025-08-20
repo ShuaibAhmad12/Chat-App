@@ -32,8 +32,10 @@ export function AuthForm() {
           username,
           full_name: fullName,
         },
+        emailRedirectTo: "https://chat-app-plum-two-92.vercel.app/", // 👈 custom redirect
       },
     })
+
 
     if (error) {
       setMessage({ type: "error", text: error.message })

@@ -10,25 +10,26 @@ import { MessageItem } from "./message-item"
 import { MessageInput } from "./message-input"
 import { ConversationsList } from "./conversations-list"
 import { DirectMessageInterface } from "./direct-message-interface"
-import { ThemeToggle } from "../../components/theme/theme-toggle"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { LogOut, MessageCircle, Users, Settings } from 'lucide-react'
+import { LogOut, MessageCircle, Users, Settings } from "lucide-react"
 import type { Profile } from "@/lib/types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useHeartbeat } from "@/hooks/use-heartbeat"
 import { UserStatusIndicator } from "./user-status-indicator"
 import { DetailedDebug } from "../debug/detailed-debug"
+import { CursorDebug } from "../debug/cursor-debug"
 
 export function ChatInterface() {
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null)
   const [activeTab, setActiveTab] = useState("general")
-  
+  const [debugMode, setDebugMode] = useState(false)
 
   // General chat hooks - now using the fixed version with image support
   const { messages, loading, sendMessage, sendImage, error } = useRealtimeMessages()
@@ -99,12 +100,14 @@ export function ChatInterface() {
                 <MessageCircle className="h-5 w-5 text-primary-foreground" />
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                ShaibiHub
+                ChatApp
               </h1>
             </div>
             <div className="flex gap-1">
               <ThemeToggle />
-              
+              <Button variant="ghost" size="sm" onClick={() => setDebugMode(!debugMode)}>
+                <Settings className="h-4 w-4" />
+              </Button>
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -113,7 +116,7 @@ export function ChatInterface() {
           {currentUser && (
             <div className="mt-3 p-3 rounded-lg bg-card/50 backdrop-blur-sm">
               <p className="text-sm font-medium">
-                Welcome back, {currentUser.user_metadata?.username || currentUser.email?.split('@')[0]}! 👋
+                Welcome back, {currentUser.user_metadata?.username || currentUser.email?.split("@")[0]}! 👋
               </p>
               {!hasPermission && (
                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
@@ -127,10 +130,16 @@ export function ChatInterface() {
         <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4 bg-muted/50">
-              <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger
+                value="general"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
                 General
               </TabsTrigger>
-              <TabsTrigger value="direct" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsTrigger
+                value="direct"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
                 Direct
               </TabsTrigger>
             </TabsList>
@@ -158,7 +167,10 @@ export function ChatInterface() {
                     </div>
                   ) : (
                     onlineUsers.map((user) => (
-                      <div key={user.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group">
+                      <div
+                        key={user.id}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                      >
                         <div className="relative">
                           <Avatar className="h-10 w-10 ring-2 ring-primary/20">
                             <AvatarImage src={user.avatar_url || undefined} alt={user.username} />
@@ -174,10 +186,10 @@ export function ChatInterface() {
                           <p className="text-sm font-medium truncate">{user.username}</p>
                           {user.full_name && <p className="text-xs text-muted-foreground truncate">{user.full_name}</p>}
                         </div>
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => handleSelectUser(user)} 
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleSelectUser(user)}
                           className="text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/10 hover:text-primary"
                         >
                           Message
@@ -200,7 +212,12 @@ export function ChatInterface() {
             </TabsContent>
           </Tabs>
 
-
+         {debugMode && (
+        <div className="mt-4 space-y-4">
+          <DetailedDebug />
+          <CursorDebug />
+        </div>
+      )}
         </div>
       </div>
 
@@ -233,7 +250,7 @@ export function ChatInterface() {
                       <AlertDescription>{error}</AlertDescription>
                     </Alert>
                   )}
-                  
+
                   {messages.length === 0 ? (
                     <div className="text-center py-12">
                       <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mx-auto mb-4">
@@ -266,10 +283,16 @@ export function ChatInterface() {
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-sm border-t p-2 z-10">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-muted/50">
-            <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger
+              value="general"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
               General
             </TabsTrigger>
-            <TabsTrigger value="direct" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger
+              value="direct"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
               Direct
             </TabsTrigger>
           </TabsList>
@@ -280,7 +303,7 @@ export function ChatInterface() {
       <div className="md:hidden fixed top-0 left-0 right-0 bg-card/90 backdrop-blur-sm border-b p-4 z-10">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold">
-            {activeTab === "direct" && selectedUser ? selectedUser.username : "ShaibiHub"}
+            {activeTab === "direct" && selectedUser ? selectedUser.username : "ChatApp"}
           </h1>
           <div className="flex items-center gap-2">
             {activeTab === "direct" && selectedUser && (

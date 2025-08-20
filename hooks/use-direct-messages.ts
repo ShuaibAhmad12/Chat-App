@@ -40,11 +40,15 @@ export function useDirectMessages(receiverId?: string) {
           return
         }
 
-        // Get profiles for other users
+        // Get profiles for other users using separate queries
         const conversationsWithProfiles = await Promise.all(
           (conversationsData || []).map(async (conv) => {
             const otherUserId = conv.user1_id === currentUserId ? conv.user2_id : conv.user1_id
+
+            // Fetch profile separately
             const { data: profileData } = await supabase.from("profiles").select("*").eq("id", otherUserId).single()
+
+            // Count unread messages
             const { count } = await supabase
               .from("direct_messages")
               .select("*", { count: "exact", head: true })
@@ -121,7 +125,7 @@ export function useDirectMessages(receiverId?: string) {
           return
         }
 
-        // Get profiles for each message
+        // Get profiles for each message using separate queries
         const messagesWithProfiles = await Promise.all(
           (messagesData || []).map(async (message) => {
             const [senderProfile, receiverProfile] = await Promise.all([
@@ -131,8 +135,20 @@ export function useDirectMessages(receiverId?: string) {
 
             return {
               ...message,
-              sender: senderProfile.data,
-              receiver: receiverProfile.data,
+              sender: senderProfile.data || {
+                id: message.sender_id,
+                username: "Unknown User",
+                full_name: null,
+                avatar_url: null,
+                is_online: false,
+              },
+              receiver: receiverProfile.data || {
+                id: message.receiver_id,
+                username: "Unknown User",
+                full_name: null,
+                avatar_url: null,
+                is_online: false,
+              },
             }
           }),
         )
@@ -186,6 +202,7 @@ export function useDirectMessages(receiverId?: string) {
         content,
         sender_id: currentUserId,
         receiver_id: receiverId,
+        message_type: "text",
       },
     ])
 
@@ -194,11 +211,31 @@ export function useDirectMessages(receiverId?: string) {
     }
   }
 
+  const sendDirectImage = async (imageUrl: string, imageName: string, receiverId: string, caption?: string) => {
+    if (!currentUserId) return
+
+    const { error } = await supabase.from("direct_messages").insert([
+      {
+        content: caption || "",
+        sender_id: currentUserId,
+        receiver_id: receiverId,
+        message_type: "image",
+        image_url: imageUrl,
+        image_name: imageName,
+      },
+    ])
+
+    if (error) {
+      console.error("Error sending direct image:", error)
+    }
+  }
+
   return {
     messages,
     conversations,
     loading,
     sendDirectMessage,
+    sendDirectImage, // Added this line
     currentUserId,
   }
 }
