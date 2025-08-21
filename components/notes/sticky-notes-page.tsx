@@ -4,15 +4,12 @@ import type React from "react"
 
 import { useState } from "react"
 import { useStickyNotes } from "@/hooks/use-sticky-notes"
-import { useCursorTracking } from "@/hooks/use-cursor-tracking"
 import { StickyNote } from "./sticky-note"
-import { UserCursor } from "../shared/user-cursor"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Plus, StickyNoteIcon, Grid3X3, List, Search, ArrowLeft, Pin, PinOff, Trash2, Users } from "lucide-react"
+import { Plus, StickyNoteIcon, Grid3X3, List, Search, ArrowLeft, Pin, PinOff, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import type { NoteColor } from "@/lib/sticky-notes-types"
 
 interface StickyNotesPageProps {
@@ -21,7 +18,6 @@ interface StickyNotesPageProps {
 
 export function StickyNotesPage({ onBack }: StickyNotesPageProps) {
   const { notes, loading, error, createNote, updateNote, deleteNote, bringToFront } = useStickyNotes()
-  const { cursors } = useCursorTracking()
   const [viewMode, setViewMode] = useState<"board" | "list">("board")
   const [searchTerm, setSearchTerm] = useState("")
   const [colorFilter, setColorFilter] = useState<NoteColor | "all">("all")
@@ -60,17 +56,9 @@ export function StickyNotesPage({ onBack }: StickyNotesPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background relative">
-      {/* Render other users' cursors */}
-      {cursors.map(
-        (cursor) =>
-          cursor.profile && (
-            <UserCursor key={cursor.id} x={cursor.cursor_x} y={cursor.cursor_y} profile={cursor.profile} />
-          ),
-      )}
-
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-card/80 backdrop-blur-sm border-b">
+      <div className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -85,21 +73,8 @@ export function StickyNotesPage({ onBack }: StickyNotesPageProps) {
                   <StickyNoteIcon className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">My Sticky Notes</h1>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>{notes.length} notes</span>
-                    {cursors.length > 0 && (
-                      <>
-                        <span>•</span>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          <Badge variant="secondary" className="text-xs">
-                            {cursors.length} viewing
-                          </Badge>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  <h1 className="text-2xl font-bold">Sticky Notes</h1>
+                  <p className="text-sm text-muted-foreground">{notes.length} notes</p>
                 </div>
               </div>
             </div>

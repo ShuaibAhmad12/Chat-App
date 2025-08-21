@@ -18,10 +18,7 @@ export function CursorDebug() {
   const [rpcExists, setRpcExists] = useState<boolean | null>(null)
   const supabase = createClient()
 
-  const { cursors, updateCursorPosition } = useCursorTracking({
-    conversationId: testConversationId,
-    enabled,
-  })
+  const { cursors, updateCursorPosition } = useCursorTracking()
 
   useEffect(() => {
     const getCurrentUser = async () => {
